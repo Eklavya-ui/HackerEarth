@@ -1,0 +1,181 @@
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+int arr[1010000];
+
+
+struct abc
+{
+  int count ;
+  int val;
+}  tree[1010000];
+/* Function to calculate x raised to the power y in O(logn)*/
+int power(int x,  int y)
+{
+    int temp;
+    if( y == 0)
+        return 1;
+    temp = power(x, y/2);
+    temp%=3;
+    if (y%2 == 0)
+        return (temp*temp)%3;
+    else
+        return (x*temp*temp)%3;
+}
+
+abc query(int node,int start,int end,int r1,int r2)
+ {
+   //cout<<start<<"      "<<end<<endl;
+  if(start>end || r1>end || r2<start) 
+  {
+   abc no;
+   no.count=0;
+   no.val=0;
+   return no;
+  }
+   
+   if(r1<=start && r2>=end)
+    {
+     // cout<<"  returnss "<<tree[node].count<<" "<<tree[node].val<<endl;
+     return tree[node];
+     
+    }
+    else
+    {
+     abc q1=query(2*node,start,(start+end)/2,r1,r2);
+     abc q2=query(2*node+1,((start+end)/2)+1,end,r1,r2);
+      abc d;
+    
+    d.count=q1.count+q2.count;
+    d.val=(q1.val*power(2,q2.count)+q2.val);
+    d.val%=3;
+    if(d.val<0)d.val+=3;
+   // cout<<"  return "<<d.count<<" "<<d.val<<endl;
+    return d;
+    }
+ }
+void update(int node ,int start,int end,int r1,int r2,int val)
+ {
+   //cout<<"update "<<start<<" "<<end<<endl;
+  if(r1>end  || r2<start   || start>end) return  ;
+  
+  
+  if(r1<=start && r2>=end)
+   {
+     tree[node].count=1;
+     tree[node].val=1;
+    
+   }
+   else
+   {
+    update(2*node, start,(start+end)/2,r1,r2,val);
+    update(2*node+1, ((start+end)/2)+1,end,r1,r2,val);
+      tree[node].count=tree[2*node].count+tree[2*node+1].count;
+          tree[node].val=tree[2*node].val*power(2,tree[2*node+1].count)+tree[2*node+1].val;
+          tree[node].val%=3;
+    if(tree[node].val<0) tree[node].val+=3;
+          
+   }
+    
+   
+ }  
+
+void build(int node , int start,int end)
+ {
+ // cout<<start<<"            "<<end<<endl;
+  if(start==end) 
+  {
+   
+   tree[node].count=1;
+   
+   tree[node].val=arr[start];
+  //  cout<<"  node "<<node<<" count "<<tree[node].count<<" val "<< tree[node].val<<endl;
+  }
+  else if(start>end) return ;
+  else
+   {
+    
+    build(2*node,start,(start+end)/2);
+    build(2*node+1,((start+end)/2)+1,end);
+    
+    tree[node].count=tree[2*node].count+tree[2*node+1].count;
+    tree[node].val=(tree[2*node].val*power(2,tree[2*node+1].count)+tree[2*node+1].val);
+    tree[node].val%=3;
+    if(tree[node].val<0) tree[node].val+=3;
+//    cout<<"  node "<<node<<" count "<<tree[node].count<<" val "<< tree[node].val<<endl;
+   }
+   
+ }
+int main()
+ {
+  //freopen("abc.txt","w",stdout);
+   int n;
+    cin>>n;
+     char cc[1000+n];
+      cin>>cc;
+      int pp=0;
+      for(int i=0;i<n;i++)
+      {
+       if(cc[i]=='0') arr[i]=0;
+       else arr[i]=1;
+   }
+    // for(int i=0;i<n;i++) cout<<arr[i]<<" ";
+     // cout<<endl;
+     for(int i=0;i<3*n;i++)
+      {
+       tree[i].count=0;
+       tree[i].val=0;
+   }
+       build(1,0,n-1);
+
+       
+      int q;
+       cin>>q;
+        while(q--)
+         {
+          int inp;
+           cin>>inp;
+           if(inp==1)
+           {
+            int index;
+             cin>>index;
+             if(arr[index]==0)
+             {
+              arr[index]=1;
+              update(1,0,n-1,index,index,1);
+    }
+     }
+     else
+     
+             {
+              int r1,r2;
+               cin>>r1>>r2;
+              //  cout<<"call"<<(n-1-r2)<<" "<<(n-1-r1)<<endl;
+              abc res= query(1,0,n-1,r1,r2);
+              
+               cout<<res.val%3<<endl;
+             }
+         }
+       
+  return 0;
+ }
+
+
+##############################################################################################
+
+My Pythonic way is slower gives time exceed error
+
+n = int(input())
+bi = input()
+q = int(input())
+for i in range(q):
+    L = list(map(int, input().split()))
+    if L[0] == 0:
+        l = L[1]
+        r = L[2]
+        print(int(bi[l:r+1],2)%3)
+    if L[0] == 1:
+        l = L[0]
+        new_bi = ""
+        new_bi = bi[:l] + '1' + bi[l+1:]
+        bi = new_bi

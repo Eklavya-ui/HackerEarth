@@ -1,0 +1,17 @@
+n = int(input())
+l = [ input().split() for i in range(n)]
+date = 0
+nodate = 0
+for i in range(len(l)):
+    for j in l[i]:
+        if l[i][0] == 'G:' and j.isdigit() and j in ['19','20']:
+            date += 2
+        if l[i][0] == 'G:' and j.isdigit() and j not in ['19','20']:
+            nodate += 2
+        if l[i][0] == 'M:' and j.isdigit() and j :
+            nodate += 1
+            
+if date <= nodate:
+    print("No Date")
+else:
+    print("Date")
